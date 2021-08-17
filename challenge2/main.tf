@@ -2,9 +2,8 @@ provider "aws" {
     region = "sa-east-1"
 }
 
-data "template_file" "userdata" {
-    template = file("server-script.sh")
-}
+# QUESTION 1: CREATE A DB SERVER AND OUTPUT THE PRIVATE IP
+
 resource "aws_instance" "dbserver" {
     ami = "ami-0f8243a5175208e08"
     instance_type = "t2.micro"
@@ -18,6 +17,11 @@ output "privateIP" {
     value = aws_instance.dbserver.private_ip
 }
 
+
+# QUESTION 2: CREATE A WEBSERVER WITH A FIXED IP AND RUN THE SCRIPT
+data "template_file" "userdata" {
+    template = file("server-script.sh")
+}
 
 resource "aws_instance" "webserver" {
     ami = "ami-0f8243a5175208e08"
@@ -34,6 +38,8 @@ resource "aws_instance" "webserver" {
 resource "aws_eip" "elasticIP" {
     instance = aws_instance.webserver.id
 }
+
+# QUESTION 3: CREATE A SECURITY GROUP FOR THE WEBSERVER OPENING PORTS 80 AND 443
 
 variable "egressandingress" {
     type = list(number)
